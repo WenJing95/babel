@@ -20,6 +20,19 @@ msg3 = ngettext('s', 'p', 42)
                         (3, ('s', 'p'), [], None)]
 
 
+@pytest.mark.parametrize('source', [
+    r'gettext("\uD83D\uDE00")',
+    r"gettext('\uD83D\uDE00')",
+    r'gettext(`\uD83D\uDE00`)',
+    r'gettext`\uD83D\uDE00`',
+    'gettext("\U0001f600")',
+])
+def test_extract_surrogate_pair(source):
+    messages = list(extract.extract('javascript', BytesIO(source.encode('utf-8'))))
+
+    assert messages == [(1, '\U0001f600', [], None)]
+
+
 def test_various_calls():
     buf = BytesIO(b"""\
 msg1 = _(i18n_arg.replace(/"/, '"'))
